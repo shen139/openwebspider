@@ -9,8 +9,8 @@ module.exports = function ()
 
     var __VERSION = {
         "MAJOR": 0,
-        "MINOR": 2,
-        "REVISION": 3
+        "MINOR": 3,
+        "REVISION": 0
     };
     this.VERSION = __VERSION["MAJOR"] + "." + __VERSION["MINOR"] + "." + __VERSION["REVISION"];
     this.VERSION_NUMBER = __VERSION["MAJOR"] * 10000 + __VERSION["MINOR"] * 100 + __VERSION["REVISION"];
@@ -126,7 +126,7 @@ module.exports = function ()
                     }
                 }
 
-                callback(err);
+                callback && callback(err);
             });
 
     };

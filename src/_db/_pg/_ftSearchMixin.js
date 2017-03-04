@@ -7,24 +7,29 @@ module.exports = function (CONF)
     {
         options = options || {};
 
-        var collection = that.connection.collection('pages');
-        collection.aggregate([
-            {"$match": {"$text": {"$search": query}}},
-            {"$project": {"_id": 1, "host": 1, "page": 1, "title": 1, "text": 1, "relevancy": {"$meta": "textScore"}}},
-            {"$match": {"relevancy": {"$gt": 1.0}}},
-            {"$sort": {"relevancy": {"$meta": "textScore"}}},
-            { $limit : 100 }
-        ], function (err, rows)
+        var unparsedSqlQuery = "SELECT id, " +
+            " CONCAT(hostname,page) as url, " +
+            " title, " +
+            " text, " +
+
+            " ts_rank_cd(tstext, plainto_tsquery($1)) as relevancy " +
+
+            " FROM pages " +
+            " WHERE tstext @@ plainto_tsquery($1) " +
+            " ORDER BY relevancy DESC LIMIT 100;";
+
+        that.query(unparsedSqlQuery, [query], function (err, res)
         {
-            var results = [];
+            var results = [],
+                rows = res.rows;
 
             if (!err)
             {
                 for (var i = 0; i < rows.length; i++)
                 {
                     results.push({
-                        "id": rows[i]["_id"],
-                        "page": rows[i]["host"].replace(":80", "") + rows[i]["page"],
+                        "id": rows[i]["id"],
+                        "page": rows[i]["url"],
                         "title": rows[i]["title"],
                         // by default trim the text to 300 chars
                         "text": options["trim-text"] === false ? rows[i]["text"] : rows[i]["text"].substring(0, options["trim-length"] !== undefined ? options["trim-length"] : 300),

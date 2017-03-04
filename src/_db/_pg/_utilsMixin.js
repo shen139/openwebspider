@@ -17,14 +17,12 @@ module.exports = function (CONF)
             function (callback)
             {
                 // Update 0001: ETAG and lastModified
-                var sql = that.format(that.sqlTemplates["dbUpdCheck0001"], [CONF.get("DB_CONNECTION_INDEX_DB")]);
-                that.query(sql, function (err, result)
+                that.query(that.sqlTemplates["dbUpdCheck0001"], null, function (err, result)
                 {
-                    if (result.length === 0)
+                    if (result.rowCount === 0)
                     {
                         // field not found: add it!
-                        var sql = that.format(that.sqlTemplates["dbUpdPatch0001"], [CONF.get("DB_CONNECTION_INDEX_DB")]);
-                        that.query(sql, function ()
+                        that.query(that.sqlTemplates["dbUpdPatch0001"], null, function ()
                         {
                             callback(false);
                         });
@@ -51,16 +49,15 @@ module.exports = function (CONF)
      */
     this.getHostID = function (host, port, cb)
     {
-        var sql = that.format(that.sqlTemplates["getHostID"], [CONF.get("DB_CONNECTION_HOST_DB"), host, port]);
-        that.query(sql, function (err, result)
+        that.query(that.sqlTemplates["getHostID"], [host, port], function (err, result)
         {
-            if (err || result.length === 0)
+            if (err || result.rowCount === 0)
             {
                 cb(true);
             }
             else
             {
-                cb(false, result[0]["id"]);
+                cb(false, result.rows[0]["id"]);
             }
         });
     };
@@ -95,12 +92,21 @@ module.exports = function (CONF)
             }
             else
             {
-                var sql = that.format(that.sqlTemplates["addHost"], [CONF.get("DB_CONNECTION_HOST_DB"), host, port]);
-                that.query(sql, function (err, result)
+                that.query(that.sqlTemplates["addHost"], [host, port], function (err, result)
                 {
-                    if (!err && result.affectedRows === 1 && result.insertId !== undefined)
+                    if (!err && result.rowCount === 1)
                     {
-                        cb(err, result.insertId);
+                        that.getHostID(host, port, function (err, host_id)
+                        {
+                            if (!err)
+                            {
+                                cb(false, host_id);
+                            }
+                            else
+                            {
+                                cb(true);
+                            }
+                        });
                     }
                     else
                     {
@@ -114,8 +120,7 @@ module.exports = function (CONF)
 
     this.updateHostStatus = function (hostID, status, cb)
     {
-        var sql = that.format(that.sqlTemplates["updateHostStatus"], [CONF.get("DB_CONNECTION_HOST_DB"), status, hostID]);
-        that.query(sql, function (err, result)
+        that.query(that.sqlTemplates["updateHostStatus"], [status, hostID], function (err, result)
         {
             cb && cb(err);
         });
@@ -124,13 +129,12 @@ module.exports = function (CONF)
 
     this.cleanHost = function (hostID, cb)
     {
-        var sql = that.format(that.sqlTemplates["cleanHost"], [
-            CONF.get("DB_CONNECTION_INDEX_DB"), hostID,
-            CONF.get("DB_CONNECTION_HOST_DB"), hostID
-        ]);
-        that.query(sql, function (err, result)
+        that.query(that.sqlTemplates["cleanHost_01"], [hostID], function (err, result)
         {
-            cb(err);
+            that.query(that.sqlTemplates["cleanHost_02"], [hostID], function (err, result)
+            {
+                cb(err);
+            });
         });
     };
 
@@ -138,36 +142,34 @@ module.exports = function (CONF)
     this.getAvailableHost = function (cb)
     {
         // get the first available host from the db
-        var sql = that.format(that.sqlTemplates["getHostByStatus"], [
-                CONF.get("DB_CONNECTION_HOST_DB"),
-                /* Status: un-indexed */ 0
-            ]) + " ORDER by priority DESC LIMIT 1";
-        that.query(sql, function (err, result)
+        that.query(that.sqlTemplates["getHostByStatus"] + " ORDER by priority DESC LIMIT 1", [/* Status: un-indexed */ 0], function (err, result)
         {
-            if (err || result.length === 0)
+            if (err || result.rowCount === 0)
             {
                 cb(true);
                 return;
             }
-            cb(false, result[0]["id"], result[0]["hostname"], result[0]["port"]);
+            cb(false, result.rows[0]["id"], result.rows[0]["hostname"], result.rows[0]["port"]);
         });
     };
 
 
     this.setOutdatedStatus = function (hostID, page, status, cb)
     {
-        var sql;
+        var sql, inserts = null;
         if (page !== null)
         {
             // all pages
-            sql = that.format(that.sqlTemplates["setOutdatedPage"], [CONF.get("DB_CONNECTION_INDEX_DB"), status, hostID, page]);
+            sql = that.sqlTemplates["setOutdatedPage"];
+            inserts = [status, hostID, page];
         }
         else
         {
-            sql = that.format(that.sqlTemplates["setOutdatedHost"], [CONF.get("DB_CONNECTION_INDEX_DB"), status, hostID]);
+            sql = that.sqlTemplates["setOutdatedHost"];
+            inserts = [status, hostID];
         }
 
-        that.query(sql, function (err)
+        that.query(sql, inserts, function (err)
         {
             cb && cb(err);
         });
@@ -176,8 +178,7 @@ module.exports = function (CONF)
 
     this.removeOutdatedPages = function (hostID, cb)
     {
-        var sql = that.format(that.sqlTemplates["removeOutdated"], [CONF.get("DB_CONNECTION_INDEX_DB"), hostID]);
-        that.query(sql, function (err)
+        that.query(that.sqlTemplates["removeOutdated"], [hostID], function (err)
         {
             cb && cb(err);
         });
@@ -186,8 +187,7 @@ module.exports = function (CONF)
 
     this.getIndexedPageInfo = function (hostID, page, cb)
     {
-        var sql = that.format(that.sqlTemplates["getPageInfo"], [CONF.get("DB_CONNECTION_INDEX_DB"), hostID, page]);
-        that.query(sql, function (err, result)
+        that.query(that.sqlTemplates["getPageInfo"], [hostID, page], function (err, result)
         {
             cb && cb(err, result);
         });
@@ -211,41 +211,71 @@ module.exports = function (CONF)
         }
 
         var unescapedSql = that.sqlTemplates["indexPage"];
-        var inserts = [CONF.get("DB_CONNECTION_INDEX_DB"), host_id, hostname, page, title, anchor_text, level, extraArgs['contentType'], text];
+        unescapedSql += " ( ";
+
+        var fields = {
+            host_id: host_id,
+            hostname: hostname,
+            page: page,
+            title: title,
+            anchor_text: anchor_text,
+            level: level,
+            contenttype: extraArgs['contentType'],
+            text: text,
+            outdated: 0,
+            date: new Date()
+        };
 
         if (CONF.get("CACHE_MODE") === 1)
         {
-            unescapedSql += ",`cache`= ?";
-            inserts.push(html);
+            fields["cache"] = html;
         }
         else if (CONF.get("CACHE_MODE") === 2)
         {
-            unescapedSql += ",`cache`= COMPRESS( ? )";
-            inserts.push(html);
+            // TODO: COMPRESS!!!
+            fields["cache"] = html;
         }
 
         var md5sum = crypto.createHash('md5');
         md5sum.update(html);
-        unescapedSql += ",`html_md5`=?";
-        inserts.push(md5sum.digest('hex'));
+        fields["html_md5"] = md5sum.digest('hex');
 
         if (extraArgs.response.headers)
         {
             if (extraArgs.response.headers['last-modified'])
             {
-                unescapedSql += ",lastModified=?";
-                inserts.push(extraArgs.response.headers['last-modified']);
+                fields["lastModified"] = extraArgs.response.headers['last-modified'];
             }
 
             if (extraArgs.response.headers['etag'])
             {
-                unescapedSql += ",ETag=?";
-                inserts.push(extraArgs.response.headers['etag']);
+                fields["etag"] = extraArgs.response.headers['etag'];
             }
         }
 
-        var sql = that.format(unescapedSql, inserts);
-        that.query(sql, function (err)
+        var strValues = "",
+            inserts = [],
+            fieldCount = 1;
+        Object.keys(fields).map(function (field)
+        {
+            if( fieldCount > 1 )
+            {
+                unescapedSql += ", ";
+                strValues += ", ";
+            }
+            unescapedSql += field;
+            strValues += " $" + fieldCount;
+            inserts.push(fields[field]);
+            fieldCount++;
+        });
+
+        unescapedSql += ", tstext";
+        strValues += ", to_tsvector( $" + fieldCount + ") ";
+        inserts.push(text);
+
+        unescapedSql += " ) VALUES (" + strValues + ")";
+
+        that.query(unescapedSql, inserts, function (err)
         {
             cb && cb(err);
         });
@@ -255,50 +285,36 @@ module.exports = function (CONF)
 
     this._savePagesMap = function (baseHostID, baseHost, basePage, linkedHostID, linkedHost, linkedPage, anchor, cb)
     {
-        var sql = that.format(that.sqlTemplates["savePageMap"], [
-            CONF.get("DB_CONNECTION_HOST_DB"),
+        that.query(that.sqlTemplates["savePageMap"], [
             baseHostID,
             basePage,
             linkedHostID,
             linkedPage,
             anchor
-        ]);
-        that.query(sql, function (err, result)
+        ], function (err, result)
         {
             cb && cb();
-        });
+        }, {suppressErrors: true});
     };
 
 
     this.getPagesMap = function (host, page, cb)
     {
-        var uparsedSqlLinks = "USE ??;\n";
-
-        // get links
-        uparsedSqlLinks += "select CONCAT(hostname, linkedpage) as url, textlink from " +
-        " ( select linkedhost_id, linkedpage, textlink from hostlist inner join pages_map on hostlist.id = pages_map.host_id where hostname = ? and page = ? ) as subtb " +
-        " inner join hostlist on hostlist.id = subtb.linkedhost_id;\n";
-
-        // get linked by
-        uparsedSqlLinks += "select CONCAT(hostname, page) as url, textlink from " +
-        " ( select host_id, page, textlink from hostlist inner join pages_map on hostlist.id = pages_map.linkedhost_id where hostname = ? and linkedpage = ? ) as subtb " +
-        " inner join hostlist on hostlist.id = subtb.host_id;";
-
-        var sql = that.format(uparsedSqlLinks, [CONF.get("DB_CONNECTION_HOST_DB"),
-            host,
-            page,
-            host,
-            page
-        ]);
-
-        that.query(sql, function (err, result)
+        that.query(that.sqlTemplates["getPageMapLinks"], [host, page], function (err, resultLinks)
         {
             if (!err)
             {
-                // result[0] = USE...
-                // resutl[1] = SELECT LINKS
-                // resutl[2] = SELECT LINKED BY
-                cb(null, result[1], result[2]);
+                that.query(that.sqlTemplates["getPageMapLinked"], [host, page], function (err, resultLinked)
+                {
+                    if (!err)
+                    {
+                        cb(null, resultLinks.rows, resultLinked.rows);
+                    }
+                    else
+                    {
+                        cb(err);
+                    }
+                });
             }
             else
             {
@@ -310,6 +326,11 @@ module.exports = function (CONF)
 
     this.deleteDuplicatePages = function (hostID, cb)
     {
+        // TODO
+        console.log("TODO: deleteDuplicatePages");
+        cb && cb(null);
+        return;
+
         var sql = that.format(that.sqlTemplates["deleteDupPages"], [
             CONF.get("DB_CONNECTION_INDEX_DB"), hostID,
             CONF.get("DB_CONNECTION_INDEX_DB"), hostID
@@ -323,10 +344,7 @@ module.exports = function (CONF)
 
     this.deletePage = function (hostID, page, cb)
     {
-        var sql = that.format(that.sqlTemplates["deletePage"], [
-            CONF.get("DB_CONNECTION_INDEX_DB"), hostID, page
-        ]);
-        that.query(sql, function (err, result)
+        that.query(that.sqlTemplates["deletePage"], [hostID, page], function (err, result)
         {
             cb && cb(err);
         });

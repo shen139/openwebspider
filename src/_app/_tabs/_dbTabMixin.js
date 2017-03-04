@@ -28,36 +28,42 @@ module.exports = function (tab3)
     comboConnType.Position = "absolute";
     comboConnType.Width = 102;
     comboConnType.Height = 22;
-    comboConnType.Items = [{"key": "mysql", "value": "MySQL"},
-        {"key": "mongodb", "value": "MongoDB"}];
-    comboConnType.Selected = "mysql";
+    comboConnType.Items = [{"key": "mysql", "value": "MySQL"}, {"key": "pg", "value": "PostgreSQL"}];
+    // comboConnType.Selected = "mysql";
 
     comboConnType.on("change", function (myself, key)
     {
-        if (key === "mongodb")
+        if (key === "pg")
         {
-            that.app.getWidgetByName("txtDbUser").Disabled = true;
-            that.app.getWidgetByName("txtDbPass").Disabled = true;
             that.app.getWidgetByName("txtDbDb1").Disabled = true;
 
             if (parseInt(that.app.getWidgetByName("txtDbPort").Text) === 3306)
             {
-                // restore mongodb default port
-                that.app.getWidgetByName("txtDbPort").Text = "27017";
+                // restore PG default port
+                that.app.getWidgetByName("txtDbPort").Text = "5432";
             }
 
+            if (that.app.getWidgetByName("txtDbUser").Text === "root")
+            {
+                // restore PG default user
+                that.app.getWidgetByName("txtDbUser").Text = "postgres";
+            }
         }
         else
         {
             // default: mysql
-            that.app.getWidgetByName("txtDbUser").Disabled = false;
-            that.app.getWidgetByName("txtDbPass").Disabled = false;
             that.app.getWidgetByName("txtDbDb1").Disabled = false;
 
-            if (parseInt(that.app.getWidgetByName("txtDbPort").Text) === 27017)
+            if (parseInt(that.app.getWidgetByName("txtDbPort").Text) === 5432)
             {
                 // restore mysql default port
                 that.app.getWidgetByName("txtDbPort").Text = "3306";
+            }
+
+            if (that.app.getWidgetByName("txtDbUser").Text === "postgres")
+            {
+                // restore mysql default user
+                that.app.getWidgetByName("txtDbUser").Text = "root";
             }
         }
     });

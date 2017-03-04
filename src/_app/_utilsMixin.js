@@ -167,6 +167,10 @@ module.exports = function ()
         {
             that.app.getWidgetByName("ckDupPages").Checked = (v === true);
         },
+        "UPDATE_MODE": function (v)
+        {
+            that.app.getWidgetByName("ckUpdateMode").Checked = (v === true);
+        },
         "DB_CONNECTION_TYPE": function (v)
         {
             that.app.getWidgetByName("comboConnType").Selected = v;

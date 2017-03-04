@@ -7,6 +7,7 @@ module.exports = function (CONF)
 
     this.connection = null;
     this.connectionType = CONF.get("DB_CONNECTION_TYPE", /* default: */ "mysql");
+
     this.sqlTemplates = {};
 
 
@@ -19,7 +20,20 @@ module.exports = function (CONF)
             return;
         }
 
-        this._connect && this._connect(cb);
+        this._connect && this._connect(function (err)
+        {
+            if (!err)
+            {
+                that.checkDB(function ()
+                {
+                    cb(err);
+                });
+            }
+            else
+            {
+                cb(err);
+            }
+        });
     };
 
 
@@ -52,8 +66,19 @@ module.exports = function (CONF)
                 // connection is OK
                 that._createDB(function (err)
                 {
-                    that.close();
-                    cb(err);
+                    if (!err)
+                    {
+                        that.checkDB(function ()
+                        {
+                            that.close();
+                            cb(err);
+                        });
+                    }
+                    else
+                    {
+                        that.close();
+                        cb(err);
+                    }
                 });
             }
             else

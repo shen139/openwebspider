@@ -1,5 +1,10 @@
 openwebspider
 
+0.3.0
+    - Update Mode
+    - Support for HTTP Headers: Last-Modified and ETag
+    - Indexer Web Service
+
 0.2.3
     - Support for MongoDB (2.6+)
     - Support to UTF-8 pages

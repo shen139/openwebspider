@@ -18,13 +18,25 @@ module.exports = function ()
     {
         try
         {
+            var headers = {
+                "User-Agent": "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36" // that.CONF.get("CRAWLER_NAME") + "/" + that.CONF.VERSION + " (http://www.openwebspider.org)"
+            };
+
+            if(urlObject["ETag"] !== undefined)
+            {
+                headers["If-None-Match"] = urlObject["ETag"];
+            }
+
+            if(urlObject["lastModified"] !== undefined)
+            {
+                headers["If-Modified-Since"] = urlObject["lastModified"];
+            }
+
             var req = http.request({
                 "hostname": urlObject["hostname"],
                 "port": urlObject["port"],
                 "path": urlObject["path"],
-                headers: {
-                    "User-Agent": that.CONF.get("CRAWLER_NAME") + "/" + that.CONF.VERSION + " (http://www.openwebspider.org)"
-                }
+                headers: headers
             }, function (response)
             {
                 var data = "";

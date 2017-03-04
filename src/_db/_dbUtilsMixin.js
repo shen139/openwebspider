@@ -23,7 +23,7 @@ module.exports = function (CONF)
             {
                 if (!err)
                 {
-                    if (CONF.get("UPDATE_MODE") == false)
+                    if (CONF.get("UPDATE_MODE") === false)
                     {
                         // delete all the pages (rels + images)
                         that.cleanHost(host_id, function (err)
@@ -40,7 +40,10 @@ module.exports = function (CONF)
                     }
                     else
                     {
-                        cb(false, host_id, url);
+                        that.setOutdatedStatus(host_id, /* all pages */ null, /* status */ 1, function (err)
+                        {
+                            cb(err, host_id, url);
+                        });
                     }
                 }
                 else

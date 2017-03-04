@@ -303,9 +303,35 @@ module.exports = function (tab1)
     });
 
 
+    var ckUpdateMode = this.app.create("checkbox", container4);
+    ckUpdateMode.Name = "ckUpdateMode";
+    ckUpdateMode.Top = 170;
+    ckUpdateMode.Left = 310;
+    ckUpdateMode.Position = "absolute";
+    ckUpdateMode.Caption = "Update Mode";
+    ckUpdateMode.Width = 100;
+    ckUpdateMode.Height = 16;
+    ckUpdateMode.on("click", function ()
+    {
+        if (ckUpdateMode.Checked === true)
+        {
+            that.updateConf("UPDATE_MODE", true);
+            // forces cache mode (if off)
+            if (checkbox6.Checked === false)
+            {
+                checkbox6.Checked = true;
+                that.updateConf("CACHE_MODE", 1);
+            }
+        }
+        else
+        {
+            that.updateConf("UPDATE_MODE", false);
+        }
+    });
+
     var checkbox6 = this.app.create("checkbox", container4);
     checkbox6.Name = "ckCache";
-    checkbox6.Top = 170;
+    checkbox6.Top = 210;
     checkbox6.Left = 310;
     checkbox6.Position = "absolute";
     checkbox6.Caption = "Cache Page";
@@ -332,7 +358,7 @@ module.exports = function (tab1)
 
     var checkbox7 = this.app.create("checkbox", container4);
     checkbox7.Name = "ckCacheFull";
-    checkbox7.Top = 170;
+    checkbox7.Top = 210;
     checkbox7.Left = 430;
     checkbox7.Position = "absolute";
     checkbox7.Caption = "Compressed";

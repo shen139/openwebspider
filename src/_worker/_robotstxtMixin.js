@@ -38,7 +38,7 @@ module.exports = function ()
 
     this.canFetchSync = function (u)
     {
-        return robotsTxtParser !== null ? robotsTxtParser.canFetchSync(that.CONF.get("CRAWLER_NAME"), u) : false;
+        return robotsTxtParser !== null ? robotsTxtParser.canFetchSync(that.CONF.get("CRAWLER_NAME"), u) : true;
     };
 
 };

@@ -1,9 +1,9 @@
-openwebspider(js) v0.2.3
+openwebspider(js) v0.3.0
     http://www.openwebspider.org/
 
 
 Requirements:
-     - MySQL Server or MongoDB (2.6+)
+     - MySQL Server or PostgreSQL (9.5+)
      - nodejs
 
 

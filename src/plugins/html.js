@@ -94,7 +94,7 @@ module.exports = function (openwebspider)
                 noindex = false,
                 nofollow = false;
 
-            if (responseObject.headers["content-type"].substr(0, 9) === "text/html")
+            if (urlObject["contentType"].substr(0, 9) === "text/html")
             {
                 // HTML page
                 // extract text and title
@@ -114,10 +114,13 @@ module.exports = function (openwebspider)
                     decodeEntities: true
                 });
 
-                $("script,noscript,style").remove();
+                if (urlObject["isIndexed"] === false)
+                {
+                    $("script,noscript,style").remove();
 
-                pageTitle = openwebspider.utils.onlyOneWhitespace($("title").text());
-                pageText = openwebspider.utils.onlyOneWhitespace($("body").text());
+                    pageTitle = openwebspider.utils.onlyOneWhitespace($("title").text());
+                    pageText = openwebspider.utils.onlyOneWhitespace($("body").text());
+                }
 
                 var metaRobots = $('meta').filter(function ()
                 {
@@ -144,7 +147,7 @@ module.exports = function (openwebspider)
                 }
             }
 
-            if (!noindex)
+            if (!noindex && urlObject["isIndexed"] === false)
             {
                 // index
                 openwebspider.dbManager.indexPage(urlObject["__hostID"],
@@ -155,7 +158,12 @@ module.exports = function (openwebspider)
                     urlObject["__depth"],
                     data,
                     pageText,
-                    {}
+                    {
+                        /* contentType: urlObject["contentType"], */
+                        response: {
+                            headers: responseObject.headers
+                        }
+                    }
                 );
             }
         }

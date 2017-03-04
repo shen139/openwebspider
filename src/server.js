@@ -21,6 +21,7 @@ var mirrorJS = require("./mirrorjs/mirror");
 mirrorJS.widgets.controller.installAll();
 var processManager = new (require("./_process/processManager"))();
 var searchHandler = require("./search");
+var indexerHandler = require("./ws/indexer");
 
 var serve = serveStatic(global.__base_path);
 
@@ -34,6 +35,10 @@ var server = http.createServer(function (req, res)
     if(url_parts.pathname === "/search")
     {
         searchHandler(req, res, url_parts.query, done);
+    }
+    else if(url_parts.pathname === "/index")
+    {
+        indexerHandler(req, res, url_parts.query, done);
     }
     else
     {

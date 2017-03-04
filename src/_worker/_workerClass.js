@@ -1,30 +1,16 @@
+var async = require('async');
 var url = require("url");
 
-var conf = require("../_app/_confClass");
 var logger = require("../_utils/logger");
-var DbClass = require("../_db/_dbClass");
-
-
-var _pluginMixin = require("./_pluginMixin");
-var _httpMixin = require("./_httpMixin");
-var _indexerMixin = require("./_indexerMixin");
-var _robotstxtMixin = require("./_robotstxtMixin");
-var _statusMixin = require("../_process/_statusMixin");
+var indexerClass = require("./_indexerClass");
 
 
 module.exports = function (/* UNUSED (yet)*/ crawler_id)
 {
     var that = this;
 
-    // inherits
-    _pluginMixin.call(this);
-    _statusMixin.call(this);
-    _httpMixin.call(this);
-    _indexerMixin.call(this);
-    _robotstxtMixin.call(this);
-
-
-    this.CONF = new conf();
+    // inherits the indexerClass
+    indexerClass.call(this);
 
     var workerIsRunning = false;
     var workerStarted = new Date();
@@ -54,8 +40,6 @@ module.exports = function (/* UNUSED (yet)*/ crawler_id)
     this.totalIndexedHosts = 0;
 
     var lastAccessedPage = null;
-
-    this.dbManager = null;
 
     // *** signals ***
     this.stopSignal = false;    // stop current host ...
@@ -102,29 +86,19 @@ module.exports = function (/* UNUSED (yet)*/ crawler_id)
 
         u = that.removeBookmark(u);
 
-        if (that.dbManager === null)
+        that.updateStage(that.STAGE_CONF_DB_CONNECT);
+        that.init(function (err)
         {
-            that.dbManager = new DbClass(that.CONF);
-        }
-
-        // loading plugins...
-        this.loadPlugins(function ()
-        {
-            // *** connects to the DB ***
-            that.updateStage(that.STAGE_CONF_DB_CONNECT);
-            that.dbManager.connect(function (err)
+            if (err)
             {
-                if (err)
-                {
-                    that.updateStage(that.STAGE_CONF_DB_ERROR);
-                    that.cleanup();
-                }
-                else
-                {
-                    that.updateStage(that.STAGE_CONF_DB_OK);
-                    that.stage2(u);
-                }
-            });
+                that.updateStage(that.STAGE_CONF_DB_ERROR);
+                that.cleanup();
+            }
+            else
+            {
+                that.updateStage(that.STAGE_CONF_DB_OK);
+                that.stage2(u);
+            }
         });
     };
 
@@ -234,20 +208,9 @@ module.exports = function (/* UNUSED (yet)*/ crawler_id)
         // on exit:
         logger.log("worker", "Cleanup!");
 
-        // 1. calls plugins' cleanup
-        that.pluginAsyncCall("cleanup", /* arguments */ null, /* all plugins */ null, function ()
-        {
-            // 2. close DB connection
-            that.dbManager && that.dbManager.close();
-            that.dbManager = null;
+        workerIsRunning = false;
 
-            // 3. reset status
-            workerIsRunning = false;
-
-            // 4. call the callback once (if defined)
-            that.onEndCallback && that.onEndCallback(true);
-            that.onEndCallback = null;
-        });
+        that.finalize();
     };
 
 
@@ -264,41 +227,69 @@ module.exports = function (/* UNUSED (yet)*/ crawler_id)
         // increment the number of total hosts indexed!
         that.totalIndexedHosts++;
 
-        // unlock the host
-        logger.log("worker", "unlocking host");
-        that.dbManager.updateHostStatus(that.dbHostID, /* Status: Indexed! */ 1);
-
-        if (that.CONF.get("DELETE_DUP_PAGES", true) === true)
-        {
-            // delete duplicate pages
-            logger.log("worker", "deleting duplicate pages");
-            that.dbManager.deleteDuplicatePages(that.dbHostID);
-        }
-
-        logger.log("worker", "saving hosts");
-        that.dbManager.saveHosts(Object.keys(that.pendingHosts), function ()
-        {
-
-            logger.log("worker", "saving pages map");
-            that.dbManager.savePagesMap(that.dbHostID, that.startingUrl, that.pendingPagesMap, function ()
+        async.series([
+            function (callback)
             {
-                if (that.quitSignal === false && that.CONF.get("SINGLE_HOST_MODE", true) === false)
+                if (that.CONF.get("UPDATE_MODE") === true)
                 {
-                    // start with another host
-                    // waits 250ms and starts from scratch
-                    setTimeout(function ()
-                    {
-                        workerIsRunning = false;
-                        that.start(null, that.onEndCallback);
-                    }, 250);
-                    logger.log("worker", "restarting...");
+                    // remove outdated pages
+                    logger.log("worker", "deleting outdated pages");
+                    that.dbManager.removeOutdatedPages(that.dbHostID, callback);
                 }
                 else
                 {
-                    // single host mode or quit signal: we've done!
-                    that.cleanup();
+                    callback(false);
                 }
-            });
+            },
+            function (callback)
+            {
+                // unlock the host
+                logger.log("worker", "unlocking host");
+                that.dbManager.updateHostStatus(that.dbHostID, /* Status: Indexed! */ 1, callback);
+            },
+            function (callback)
+            {
+                if (that.CONF.get("DELETE_DUP_PAGES", true) === true)
+                {
+                    // delete duplicate pages
+                    logger.log("worker", "deleting duplicate pages");
+                    that.dbManager.deleteDuplicatePages(that.dbHostID, callback);
+                }
+            },
+            function (callback)
+            {
+                logger.log("worker", "saving hosts");
+                that.dbManager.saveHosts(Object.keys(that.pendingHosts), function ()
+                {
+                    callback(false);
+                });
+            },
+            function (callback)
+            {
+                logger.log("worker", "saving pages map");
+                that.dbManager.savePagesMap(that.dbHostID, that.startingUrl, that.pendingPagesMap, function ()
+                {
+                    callback(false);
+                });
+            }
+        ], function ()
+        {
+            if (that.quitSignal === false && that.CONF.get("SINGLE_HOST_MODE", true) === false)
+            {
+                // start with another host
+                // waits 250ms and starts from scratch
+                setTimeout(function ()
+                {
+                    workerIsRunning = false;
+                    that.start(null, that.onEndCallback);
+                }, 250);
+                logger.log("worker", "restarting...");
+            }
+            else
+            {
+                // single host mode or quit signal: we've done!
+                that.cleanup();
+            }
         });
     };
 
