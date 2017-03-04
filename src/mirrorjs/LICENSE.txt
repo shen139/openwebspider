@@ -1,0 +1,19 @@
+MirrorJS Software License Agreement
+
+This agreement is a legal agreement between you and MirrorJS Development Group (MirrorJS) with respect to the use of the MirrorJS Software (Software).
+By using the Software, you acknowledge that you and such use are bound by and subject to the provisions of this agreement without modifications. If you do not accept these terms of use in their entirety, you may not access or use the Software.
+
+1) The Software is being licensed to you free of charge for your private personal use only. The Software is licensed, not sold. You may use the Software for non-commercial purposes only.
+
+2) You may not use the Software in support of any commercial entity or activity without the express written agreement of MirrorJS. By way of example, and not as a limitation, charging others to use the Software either directly or indirectly, using the Software to sell any goods or services.
+
+3) The Software is protected by copyright laws and international copyright treaties, as well as other intellectual property laws and treaties. You will not disassemble, decompile, or reverse engineer the Software. Any unauthorized reproduction or redistribution of the Software is expressly prohibited by law, and may result in severe civil and criminal penalties.
+
+4) You are responsible for all activities that occur in your use of the Software. You represent and warrant that you will use the Software only for lawful purposes and in accordance with this agreement, and that you will not use the Software to violate any law, regulation or ordinance or any right of MirrorJS or any third party, including, without limitation, any right of privacy, publicity, copyright, patent or trademark. MirrorJS will not be responsible for these activities.
+
+5) The Software is distributed "AS IS". No warranty or any kind is expressed or implied. You use at your own risk. MirrorJS will not be liable for data loss, damages, loss of profits or any other kind of loss while using or misusing this software.
+
+6) If any part of this agreement is held invalid or unenforceable, that portion shall be construed in a manner consistent with applicable law to reflect, as nearly as possible, the original intentions of the parties, and the remaining portions shall remain in full force and effect.
+
+
+info (at) mirrorjs (dot) com

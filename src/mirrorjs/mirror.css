@@ -1,0 +1,57 @@
+body
+{
+    font-family: 'Trebuchet MS', Tahoma, Verdana, Arial, sans-serif;
+    font-size: 11px;
+    font-style: normal;
+    font-variant: normal;
+}
+
+.ui-tabs .ui-tabs-nav
+{
+    min-height: 33px;
+}
+
+.ui-widget-overlay
+{
+    background: #CCC;
+}
+
+.mirrorJSWidget
+{}
+
+.mirrorJS_button button
+{
+    border: 1px solid #777;
+    background-color: #EEE;
+    margin: 2px;
+}
+
+.mirrorJS_textfield input
+{
+    border: 1px solid #777;
+    background-color: #FFF;
+    margin: 2px;
+}
+
+.mirrorJS_label
+{
+    margin: 2px;
+    background-color: #FFF;
+}
+
+.mirrorJS_container
+{
+    margin: 5px 0 10px 0;
+    outline: 1px dotted #CCC;
+    padding: 2px;
+}
+
+.mirrorJS_accordion
+{
+    border: 1px solid #DDD;
+}
+
+.slick-cell.selected
+{
+    background-color: #FFB;
+}

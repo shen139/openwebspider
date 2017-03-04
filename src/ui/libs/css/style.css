@@ -1,0 +1,41 @@
+.ui-dialog .ui-dialog-content {
+    overflow: hidden;
+}
+
+.mirrorJSWidget {
+    font-size: 12px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.mirrorJS_label {
+    background-color: transparent;
+}
+
+.mirrorJS_label label {
+    display: block;
+}
+
+.mirrorJS_container .loading {
+    background: url(images/loading16.gif) no-repeat center;
+}
+
+.mirrorJS_textfield input {
+    background-color: #FFF;
+}
+
+.mirrorJS_textfield .mirrorJS_disabled {
+    background-color: #EEE;
+}
+
+.mirrorJS_hyperlink a {
+    color: #000088;
+}
+
+.label-no-wrap {
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.ui-dialog-titlebar {
+    color: #00B;
+}

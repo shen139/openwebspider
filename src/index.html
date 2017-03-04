@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>OpenWebSpider(js)</title>
+        <meta charset="utf-8">
+
+        <link rel="stylesheet" href="ui/libs/css/jquery-ui-1.11.2.min.css"/>
+        <link rel="stylesheet" href="mirrorjs/widgets/SlickGrid/slick.grid.css" type="text/css"/>
+        <link rel="stylesheet" href="mirrorjs/mirror.css" type="text/css"/>
+        <link rel="stylesheet" href="ui/libs/css/style.css" type="text/css"/>
+
+        <script src="ui/libs/js/jquery-1.9.1.min.js"></script>
+        <script src="ui/libs/js/jquery-ui-1.11.2.min.js"></script>
+        <script src="ui/libs/js/sockjs-0.3.min.js"></script>
+        <script src="mirrorjs/widgets/SlickGrid/jquery.event.drag-2.2.js"></script>
+        <script src="mirrorjs/widgets/SlickGrid/slick.core.js"></script>
+        <script src="mirrorjs/widgets/SlickGrid/slick.grid.js"></script>
+        <script src="mirrorjs/widgets/SlickGrid/slick.dataview.js"></script>
+        <script src="mirrorjs/widgets/SlickGrid/plugins/slick.rowselectionmodel.js"></script>
+        <script src="mirrorjs/mirror.js"></script>
+        <script src="mirrorjs/widgets/textfield.js"></script>
+        <script src="mirrorjs/widgets/hyperlink.js"></script>
+        <script src="mirrorjs/widgets/button.js"></script>
+        <script src="mirrorjs/widgets/label.js"></script>
+        <script src="mirrorjs/widgets/checkbox.js"></script>
+        <script src="mirrorjs/widgets/container.js"></script>
+        <script src="mirrorjs/widgets/dialog.js"></script>
+        <script src="mirrorjs/widgets/tabber.js"></script>
+        <script src="mirrorjs/widgets/datagrid.js"></script>
+        <script src="mirrorjs/widgets/hyperlink.js"></script>
+        <script src="mirrorjs/widgets/progressbar.js"></script>
+        <script src="mirrorjs/widgets/combobox.js"></script>
+
+        <script>
+            $(document).ready(function ()
+            {
+                var appServerConf = {
+                    host: location.hostname,
+                    port: location.port
+                };
+
+                var handlers = {
+                    onConnect: function ()
+                    {
+                        console.log("Connected!!!");
+                    },
+                    onClose: function (obj)
+                    {
+                        console.log("Connection closed!!!", obj);
+                    }
+                };
+
+                var myApp = new mirrorJS.app.remote(
+                        new mirrorJS.ui.connectors.local("html", new mirrorJS.connectors.SockJS(appServerConf)),
+                        /* alias */ "openwebspider",
+                        handlers);
+            });
+
+        </script>
+    </head>
+
+    <body>
+
+    </body>
+</html>
