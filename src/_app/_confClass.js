@@ -28,7 +28,7 @@ module.exports = function ()
         "SINGLE_HOST_MODE"      : true,
         "ADD_EXTERNAL_HOSTS"    : false,
         "CONCURRENCY"           : 10,           // 10 concurrent http requests
-        "CACHE_MODE"            : 0,            // 0 no, 1: OK, 2: Compressed
+        "CACHE_MODE"            : 0,            // 0 no, 1: OK
         "PAGES_MAP"             : 0,            // o: no, 1: base, 2: full
 
         "MAX_DEPTH"             : 3,

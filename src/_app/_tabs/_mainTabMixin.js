@@ -317,11 +317,8 @@ module.exports = function (tab1)
         {
             that.updateConf("UPDATE_MODE", true);
             // forces cache mode (if off)
-            if (checkbox6.Checked === false)
-            {
-                checkbox6.Checked = true;
-                that.updateConf("CACHE_MODE", 1);
-            }
+            checkbox6.Checked = true;
+            that.updateConf("CACHE_MODE", 1);
         }
         else
         {
@@ -345,35 +342,7 @@ module.exports = function (tab1)
         }
         else
         {
-            if (checkbox7.Checked === false)
-            {
-                that.updateConf("CACHE_MODE", 1);   // simple cache
-            }
-            else
-            {
-                that.updateConf("CACHE_MODE", 2);   // compressed cache
-            }
-        }
-    });
-
-    var checkbox7 = this.app.create("checkbox", container4);
-    checkbox7.Name = "ckCacheFull";
-    checkbox7.Top = 210;
-    checkbox7.Left = 430;
-    checkbox7.Position = "absolute";
-    checkbox7.Caption = "Compressed";
-    checkbox7.Width = 100;
-    checkbox7.Height = 16;
-    checkbox7.Disabled = true;
-    checkbox7.on("click", function ()
-    {
-        if (checkbox7.Checked === false)
-        {
             that.updateConf("CACHE_MODE", 1);   // simple cache
-        }
-        else
-        {
-            that.updateConf("CACHE_MODE", 2);   // compressed cache
         }
     });
 

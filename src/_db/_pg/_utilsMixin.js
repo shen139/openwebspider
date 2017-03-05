@@ -226,13 +226,8 @@ module.exports = function (CONF)
             date: new Date()
         };
 
-        if (CONF.get("CACHE_MODE") === 1)
+        if (CONF.get("CACHE_MODE") > 0)
         {
-            fields["cache"] = html;
-        }
-        else if (CONF.get("CACHE_MODE") === 2)
-        {
-            // TODO: COMPRESS!!!
             fields["cache"] = html;
         }
 
@@ -240,7 +235,7 @@ module.exports = function (CONF)
         md5sum.update(html);
         fields["html_md5"] = md5sum.digest('hex');
 
-        if (extraArgs.response.headers)
+        if (extraArgs && extraArgs.response && extraArgs.response.headers)
         {
             if (extraArgs.response.headers['last-modified'])
             {

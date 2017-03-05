@@ -138,17 +138,7 @@ module.exports = function ()
         },
         "CACHE_MODE": function (v)
         {
-            if (v === 0)
-            {
-                that.app.getWidgetByName("ckCache").Checked = false;
-                that.app.getWidgetByName("ckCacheFull").Checked = false;
-            }
-            else
-            {
-                that.app.getWidgetByName("ckCache").Checked = true;
-                that.app.getWidgetByName("ckCacheFull").Checked = (v === 2);
-            }
-
+            that.app.getWidgetByName("ckCache").Checked = v > 0;
         },
         "PAGES_MAP": function (v)
         {

@@ -73,6 +73,8 @@ CREATE SEQUENCE pages_id_seq
 
 ALTER SEQUENCE pages_id_seq OWNED BY pages.id;
 
+CREATE INDEX textsearch_idx ON pages USING GIN (tstext);
+
 CREATE TABLE pages_map (
     host_id bigint NOT NULL,
     page character varying NOT NULL,
@@ -92,7 +94,7 @@ ALTER TABLE ONLY hostlist_extras
     ADD CONSTRAINT hostlist_extras_pkey PRIMARY KEY (host_id);
 
 ALTER TABLE ONLY hostlist
-    ADD CONSTRAINT hostlist_pkey PRIMARY KEY (hostname);
+    ADD CONSTRAINT hostlist_pkey PRIMARY KEY (hostname,port) ;
 
 ALTER TABLE ONLY pages_map
     ADD CONSTRAINT pages_map_pkey PRIMARY KEY (host_id, page, linkedpage, linkedhost_id);
