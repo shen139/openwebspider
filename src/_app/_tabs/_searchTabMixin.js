@@ -17,7 +17,7 @@ module.exports = function (tab5)
         that.gridSearch.dataview.clear();
 
         var dbManager = new DbClass(that.CONF);
-        dbManager.connect(function (err)
+        dbManager.connect(null, function (err)
         {
             if (!err)
             {

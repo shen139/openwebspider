@@ -80,7 +80,7 @@ module.exports = function (req, res, queryStringObj, done)
     function getResults(query, callback)
     {
         var ret = [];
-        dbManager.connect(function (err)
+        dbManager.connect(null, function (err)
         {
             if (err)
             {

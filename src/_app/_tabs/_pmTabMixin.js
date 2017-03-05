@@ -20,7 +20,7 @@ module.exports = function (tab3)
         that.gridPagesMapLinked.dataview.clear();
 
         var dbManager = new DbClass(that.CONF);
-        dbManager.connect(function (err)
+        dbManager.connect(null, function (err)
         {
             if (!err)
             {

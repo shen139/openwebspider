@@ -30,7 +30,7 @@ module.exports = {
                         "WHERE host_id = ? AND id NOT IN " +
                         "( " +
                         "   SELECT id FROM ??.view_unique_pages WHERE host_id = ? " +
-                        ")",
+                        " )",
 
     "setOutdatedHost":  "UPDATE ??.pages " +
                         "SET `outdated` = ? " +

@@ -326,16 +326,7 @@ module.exports = function (CONF)
 
     this.deleteDuplicatePages = function (hostID, cb)
     {
-        // TODO
-        console.log("TODO: deleteDuplicatePages");
-        cb && cb(null);
-        return;
-
-        var sql = that.format(that.sqlTemplates["deleteDupPages"], [
-            CONF.get("DB_CONNECTION_INDEX_DB"), hostID,
-            CONF.get("DB_CONNECTION_INDEX_DB"), hostID
-        ]);
-        that.query(sql, function (err, result)
+        that.query(that.sqlTemplates["deleteDupPages"], [hostID], function (err, result)
         {
             cb && cb(err);
         });

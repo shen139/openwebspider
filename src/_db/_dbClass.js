@@ -12,7 +12,7 @@ module.exports = function (CONF)
 
 
     // *** interface ***
-    this.connect = function (cb)
+    this.connect = function (params, cb)
     {
         if (that.connection !== null)
         {
@@ -20,7 +20,7 @@ module.exports = function (CONF)
             return;
         }
 
-        this._connect && this._connect(function (err)
+        this._connect && this._connect(params, function (err)
         {
             if (!err)
             {
@@ -37,15 +37,15 @@ module.exports = function (CONF)
     };
 
 
-    this.close = function ()
+    this.close = function (cb)
     {
-        this._close && this._close();
+        this._close && this._close(cb);
     };
 
 
     this.verify = function (cb)
     {
-        that.connect(function (err)
+        that.connect(null, function (err)
         {
             cb(err);
             if (!err)
@@ -59,7 +59,9 @@ module.exports = function (CONF)
 
     this.createDB = function (cb)
     {
-        that.connect(function (err)
+        that.connect({
+            forceDB: that.getDefaultDB()
+        }, function (err)
         {
             if (!err)
             {

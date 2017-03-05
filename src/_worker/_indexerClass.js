@@ -38,7 +38,7 @@ module.exports = function (/* UNUSED (yet)*/ crawler_id)
         that.loadPlugins(function ()
         {
             // connecting to the DB
-            that.dbManager.connect(function (err)
+            that.dbManager.connect(null, function (err)
             {
                 cb(err);
             });

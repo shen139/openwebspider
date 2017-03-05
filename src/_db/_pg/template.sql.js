@@ -18,11 +18,13 @@ module.exports = {
     "savePageMap":      "INSERT INTO pages_map (host_id, page, linkedhost_id, linkedpage, textlink) " +
                         "VALUES($1,$2,$3,$4,$5)",
 
-    "deleteDupPages":   "TODO DELETE FROM ??.pages " +
-                        "WHERE host_id = ? AND id NOT IN " +
-                        "( " +
-                        "   SELECT id FROM ??.view_unique_pages WHERE host_id = ? " +
-                        ")",
+    "deleteDupPages":   "DELETE FROM pages " +
+                        "WHERE host_id = $1 and EXISTS ( " +
+                        "    SELECT * " +
+                        "    FROM pages AS t2 " +
+                        "    WHERE t2.html_md5 = pages.html_md5 " +
+                        "    AND t2.id < pages.id " +
+                        " )",
 
     "setOutdatedHost":  "UPDATE pages " +
                         "SET outdated = $1 " +
@@ -32,10 +34,8 @@ module.exports = {
                         "SET outdated = $1 " +
                         "WHERE host_id = $2 and page = $3",
 
-
     "removeOutdated":   "DELETE FROM pages " +
                         "WHERE host_id = $1 AND outdated = true",
-
 
     "getPageInfo":      "SELECT cache, contentType, level, etag, lastModified " +
                         "FROM pages " +

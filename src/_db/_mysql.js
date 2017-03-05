@@ -20,7 +20,13 @@ module.exports = function (CONF)
     _fulltextSearchMixin.call(this, CONF);
 
 
-    this._connect = function (cb)
+    this.getDefaultDB = function ()
+    {
+        return "postgres";
+    };
+
+
+    this._connect = function (params, cb)
     {
         that.connection = mysql.createConnection({
             multipleStatements: true,
@@ -125,7 +131,7 @@ module.exports = function (CONF)
                 if (err)
                 {
                     // file not found!
-                    console.log("createDB::file not found: _db/mysql/script.sql");
+                    console.log("createDB::file not found: _db/_mysql/script.sql");
                     cb(true);
                 }
                 else
