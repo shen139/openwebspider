@@ -300,6 +300,18 @@ module.exports = function ()
             return;
         }
 
+        if (that.CONF.get("__INTERNAL_GET_ALL_URLS") === true)
+        {
+            // Return all URLs
+            if (!that.addedPagesMap[resolvedUrl])
+            {
+                // updates the cache
+                that.addedPagesMap[parsedUrl.href] = true;
+                that.pages.push(parsedUrl);
+            }
+            return;
+        }
+
         // pages map
         if (that.CONF.get("PAGES_MAP") > 0)
         {
@@ -325,7 +337,7 @@ module.exports = function ()
         if (parsedUrl["host"] === urlObject["host"])
         {
             // same host
-            if (!that.addedPagesMap[resolvedUrl])
+            if (that.addedPagesMap && !that.addedPagesMap[resolvedUrl])
             {
                 // updates the cache
                 that.addedPagesMap[parsedUrl.href] = true;
@@ -337,7 +349,6 @@ module.exports = function ()
                     that.pages.push(parsedUrl);
                     that.addedUrls++;
                 }
-
             }
         }
         else

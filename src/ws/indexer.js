@@ -13,7 +13,7 @@ conf.loadFile();
 
 
 /**
- * Sample URL: http://127.0.0.1:9999/index?u=aHR0cDovL3d3dy5leGFtcGxlLmNvbTo4MDgwL3Rlc3Q_cXM9MTIzNA==
+ * Sample URL: http://127.0.0.1:9999/index?u=aHR0cDovL3d3dy5vcGVud2Vic3BpZGVyLm9yZy8=
  *
  * @param req
  * @param res
@@ -64,6 +64,7 @@ module.exports = function (req, res, queryStringObj, done)
         indexer.CONF.set("UPDATE_MODE", true);
         var cacheMode = indexer.CONF.get("CACHE_MODE");
         indexer.CONF.set("CACHE_MODE", cacheMode || 1);
+        indexer.CONF.set("__INTERNAL_GET_ALL_URLS", true);
 
         return indexer.init(function (err)
         {
@@ -90,12 +91,28 @@ module.exports = function (req, res, queryStringObj, done)
                         // sets base page info
                         indexer.setPageBaseInfo(parsedUrl, host_id);
 
+
+                        // Indexer init
+                        indexer.pages = [];
+                        indexer.addedPagesMap = {};
+
                         indexer.index(parsedUrl, function (err, msg)
                         {
                             if (err)
                             {
                                 retObj['status'] = 'ko';
                                 retObj['error'] = msg;
+                            }
+                            else
+                            {
+                                retObj['links'] = [];
+                                indexer.pages.map(function (url)
+                                {
+                                    retObj['links'].push({
+                                        host: url["host"],
+                                        path: url["path"]
+                                    });
+                                })
                             }
                             next(false);
                         });
