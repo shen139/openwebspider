@@ -30,12 +30,16 @@ module.exports = function (CONF)
     this._connect = function (params, cb)
     {
         var useDB = CONF.get("DB_CONNECTION_INDEX_DB", "openwebspider");
+        that.ignoreChecks = false;
+
         if (params)
         {
             if (params.forceDB)
             {
                 useDB = params.forceDB;
             }
+
+            that.ignoreChecks = params.ignoreChecks === true;
             // ...
         }
 
@@ -51,7 +55,6 @@ module.exports = function (CONF)
 
         that.connection.connect(function (err, client, done)
         {
-            console.log("PG::connect");
             if (err)
             {
                 that.connection = null;
@@ -84,7 +87,9 @@ module.exports = function (CONF)
     /** _query
      *
      * @param sql
+     * @param inserts
      * @param cb
+     * @param params
      * @private
      *
      */
@@ -183,7 +188,8 @@ module.exports = function (CONF)
             {
                 // Connects to default DB
                 that.connect({
-                    forceDB: that.getDefaultDB()
+                    forceDB: that.getDefaultDB(),
+                    ignoreChecks: true
                 }, callback);
             },
             function (callback)
@@ -201,7 +207,9 @@ module.exports = function (CONF)
             function (callback)
             {
                 // Connects to created DB
-                that.connect(null, callback);
+                that.connect({
+                    ignoreChecks: true
+                }, callback);
             },
             function (callback)
             {
@@ -209,6 +217,7 @@ module.exports = function (CONF)
             },
             function (callback)
             {
+                that.ignoreChecks = false;
                 that.checkDB(callback);
             }
         ], function (err)

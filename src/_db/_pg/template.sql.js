@@ -37,7 +37,7 @@ module.exports = {
     "removeOutdated":   "DELETE FROM pages " +
                         "WHERE host_id = $1 AND outdated = true",
 
-    "getPageInfo":      "SELECT cache, contentType, level, etag, lastModified " +
+    "getPageInfo":      "SELECT cache, contentType AS lc_contenttype, level, ETag AS lc_etag, lastModified AS lc_lastmodified " +
                         "FROM pages " +
                         "WHERE host_id = $1 AND page = $2",
 

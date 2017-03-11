@@ -53,7 +53,6 @@ CREATE TABLE pages (
     title character varying NOT NULL,
     anchor_text character varying NOT NULL,
     text text NOT NULL,
-    tstext tsvector,
     cache text,
     html_md5 character varying NOT NULL,
     level integer DEFAULT 0 NOT NULL,
@@ -73,7 +72,18 @@ CREATE SEQUENCE pages_id_seq
 
 ALTER SEQUENCE pages_id_seq OWNED BY pages.id;
 
-CREATE INDEX textsearch_idx ON pages USING GIN (tstext);
+CREATE INDEX ows_text_idx ON pages
+    USING gin(to_tsvector('english', text));
+
+CREATE INDEX ows_host_idx ON pages
+    USING gin(to_tsvector('english', hostname || '' || page));
+
+CREATE INDEX ows_title_idx ON pages
+    USING gin(to_tsvector('english', title));
+
+CREATE INDEX ows_anchor_idx ON pages
+    USING gin(to_tsvector('english', anchor_text));
+
 
 CREATE TABLE pages_map (
     host_id bigint NOT NULL,

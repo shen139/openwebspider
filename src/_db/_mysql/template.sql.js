@@ -45,7 +45,7 @@ module.exports = {
                         "WHERE host_id = ? AND `outdated` = 1",
 
 
-    "getPageInfo":      "SELECT `cache`, `contentType`, `level`, `ETag`, `lastModified`  " +
+    "getPageInfo":      "SELECT `cache`, `contentType` AS lc_contenttype, `level`, `ETag` AS lc_etag, `lastModified` AS lc_lastmodified " +
                         "FROM ??.pages " +
                         "WHERE host_id = ? AND page = ?",
 

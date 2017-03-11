@@ -12,19 +12,28 @@ module.exports = function (CONF)
             " title, " +
             " text, " +
 
-            " ts_rank_cd(tstext, plainto_tsquery($1)) as relevancy " +
-
+            " ts_rank_cd(to_tsvector('english', text), to_tsquery('english', $1), 7) + " +
+            " ts_rank_cd(to_tsvector('english',  hostname || '' || page), to_tsquery('english', $1), 7) + " +
+            " ts_rank_cd(to_tsvector('english', title), to_tsquery('english', $1), 7) + " +
+            " ts_rank_cd(to_tsvector('english', anchor_text), to_tsquery('english', $1), 7) " +
+            "                   AS relevancy " +
             " FROM pages " +
-            " WHERE tstext @@ plainto_tsquery($1) " +
+            " WHERE " +
+            "           to_tsvector('english', text) @@ to_tsquery('english', $1) OR " +
+            "           to_tsvector('english', hostname || '' || page) @@ to_tsquery('english', $1) OR " +
+            "           to_tsvector('english', title) @@ to_tsquery('english', $1) OR " +
+            "           to_tsvector('english', anchor_text) @@ to_tsquery('english', $1) " +
             " ORDER BY relevancy DESC LIMIT 100;";
 
-        that.query(unparsedSqlQuery, [query], function (err, res)
+        var ftQuery = query.split(/\W+/).filter(function(s){return s}).join(" & ");
+        that.query(unparsedSqlQuery, [ftQuery], function (err, res)
         {
             var results = [],
-                rows = res.rows;
+                rows;
 
             if (!err)
             {
+                rows = res.rows;
                 for (var i = 0; i < rows.length; i++)
                 {
                     results.push({
@@ -36,6 +45,10 @@ module.exports = function (CONF)
                         "relevancy": rows[i]["relevancy"]
                     });
                 }
+            }
+            else
+            {
+                console.log(err);
             }
 
             callback(results);

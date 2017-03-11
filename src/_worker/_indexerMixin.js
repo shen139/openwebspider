@@ -88,20 +88,20 @@ module.exports = function ()
                         if (!err && info && info.length > 0)
                         {
                             urlObject["isIndexed"] = true;
-                            urlObject["contentType"] = info[0]["contentType"];
+                            urlObject["contentType"] = info[0]["lc_contenttype"];
 
                             if (info[0]["cache"])
                             {
                                 // we can use the header ETag and Last-Modified only if we have the cached version of the page
                                 urlObject['cache'] = info[0]["cache"].toString();
 
-                                if (info[0]["ETag"])
+                                if (info[0]["lc_etag"])
                                 {
-                                    urlObject['ETag'] = info[0]["ETag"];
+                                    urlObject['ETag'] = info[0]["lc_etag"];
                                 }
-                                if (info[0]["lastModified"])
+                                if (info[0]["lc_lastmodified"])
                                 {
-                                    urlObject['lastModified'] = info[0]["lastModified"];
+                                    urlObject['lastModified'] = info[0]["lc_lastmodified"];
                                 }
                             }
                             else

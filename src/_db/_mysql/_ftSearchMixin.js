@@ -48,6 +48,10 @@ module.exports = function (CONF)
                     });
                 }
             }
+            else
+            {
+                console.log(err);
+            }
 
             callback(results);
         });

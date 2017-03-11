@@ -213,7 +213,7 @@ module.exports = function (CONF)
         var unescapedSql = that.sqlTemplates["indexPage"];
         var inserts = [CONF.get("DB_CONNECTION_INDEX_DB"), host_id, hostname, page, title, anchor_text, level, extraArgs['contentType'], text];
 
-        if (CONF.get("CACHE_MODE") > 1)
+        if (CONF.get("CACHE_MODE") > 0)
         {
             unescapedSql += ",`cache`= ?";
             inserts.push(html);

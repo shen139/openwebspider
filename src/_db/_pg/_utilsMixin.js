@@ -13,6 +13,10 @@ module.exports = function (CONF)
      */
     this.checkDB = function (cb)
     {
+        if (that.ignoreChecks === true)
+        {
+            return cb(false);
+        }
         async.series([
             function (callback)
             {
@@ -189,7 +193,7 @@ module.exports = function (CONF)
     {
         that.query(that.sqlTemplates["getPageInfo"], [hostID, page], function (err, result)
         {
-            cb && cb(err, result);
+            cb && cb(err, result.rows);
         });
     };
 
@@ -205,7 +209,7 @@ module.exports = function (CONF)
             }
         }
 
-        if(!extraArgs['contentType'] && extraArgs['response'] && extraArgs['response']['headers'] && extraArgs['response']['headers']['content-type'])
+        if (!extraArgs['contentType'] && extraArgs['response'] && extraArgs['response']['headers'] && extraArgs['response']['headers']['content-type'])
         {
             extraArgs['contentType'] = extraArgs['response']['headers']['content-type'];
         }
@@ -253,7 +257,7 @@ module.exports = function (CONF)
             fieldCount = 1;
         Object.keys(fields).map(function (field)
         {
-            if( fieldCount > 1 )
+            if (fieldCount > 1)
             {
                 unescapedSql += ", ";
                 strValues += ", ";
@@ -263,10 +267,6 @@ module.exports = function (CONF)
             inserts.push(fields[field]);
             fieldCount++;
         });
-
-        unescapedSql += ", tstext";
-        strValues += ", to_tsvector( $" + fieldCount + ") ";
-        inserts.push(text);
 
         unescapedSql += " ) VALUES (" + strValues + ")";
 
