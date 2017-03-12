@@ -2,20 +2,19 @@
 Open Source Web Spider
 
 
-## Requirements:
-* MySQL Server or PostgreSQL
+## Requirements
+* MySQL Server / PostgreSQL
 * nodejs
 
 
 ## Install
-
 ```sh
 $ npm install
 $ node src/server.js
 ```
 
 
-## Getting started:
+## Getting started
 * Open a web-browser at http://127.0.0.1:9999/
 * Go in the third tab (Database) and configure your settings
 * Verify that openwebspider correctly connects to your server by clicking the "Verify" button
@@ -29,7 +28,12 @@ Search and indexer web services holds the connection to the database.
 If you change the database settings you should restart the openwebspider's server.
 
 
-## Known issue:
+## Web Services
+* [Indexer Web Service](http://www.openwebspider.org/documentation/openwebspider-js/openwebspider-indexer-web-service/ "Indexer Web Service")
+* [Search Web Service](http://www.openwebspider.org/documentation/openwebspider-js/search-web-service/ "Search Web Service")
+
+
+## Known issue
 The openwebspider's UI uses the Helvetica font; under linux you might not have it installed and,
 especially with google chrome, the application is rendered very badly.
 You can fix this by installing Microsoft TrueType core fonts
@@ -39,7 +43,7 @@ You can fix this by installing Microsoft TrueType core fonts
 ```
 
 
-## Contacts:
+## Contacts
 	http://www.openwebspider.org/
     info @ openwebspider.org
 
