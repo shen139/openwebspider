@@ -5,6 +5,7 @@
 * Update Mode
 * Support for HTTP Headers: Last-Modified and ETag
 * Indexer Web Service
+* Example tools using Indexer Web Service
 
 ## 0.2.3
 * Support for MongoDB (2.6+)

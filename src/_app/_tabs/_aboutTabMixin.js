@@ -121,9 +121,18 @@ module.exports = function (tab)
     lblPowered.Top = 75;
     lblPowered.Left = 10;
     lblPowered.Position = "absolute";
-    lblPowered.Caption = "Powered by mirrorjs, nodejs and mysql";
+    lblPowered.Caption = "Powered by mirrorjs, nodejs, mysql and postgresql";
     lblPowered.Width = 300;
     lblPowered.Height = 14;
     lblPowered.Color = "#666";
 
+
+    var hlSupport = this.app.create("hyperlink", container);
+    hlSupport.Top = 45;
+    hlSupport.Left = 400;
+    hlSupport.Position = "absolute";
+    hlSupport.Caption = "Support this project";
+    hlSupport.Width = 200;
+    hlSupport.Height = 22;
+    hlSupport.Link = "http://www.openwebspider.org/support-this-project/";
 };

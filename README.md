@@ -24,6 +24,10 @@ $ node src/server.js
 * (remember that this will remove all existing tables and will create them from scratch)
 * Now you are ready to start an openwebspider worker; first tab (Worker): Go
 
+### NOTE
+Search and indexer web services holds the connection to the database.
+If you change the database settings you should restart the openwebspider's server.
+
 
 ## Known issue:
 The openwebspider's UI uses the Helvetica font; under linux you might not have it installed and,
